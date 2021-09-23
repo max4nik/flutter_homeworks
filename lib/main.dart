@@ -36,8 +36,7 @@ class _RandomWordsState extends State<RandomWords> {
     return ListView.builder(
         padding: const EdgeInsets.all(16.0),
         itemBuilder: /*1*/ (context, i) {
-          if (i.isOdd) return const Divider();
-          /*2*/
+          if (i.isOdd) return const Divider(); /*2*/
 
           final index = i ~/ 2; /*3*/
           if (index >= _suggestions.length) {
@@ -60,11 +59,16 @@ class _RandomWordsState extends State<RandomWords> {
       ),
       onTap: () {
         setState(() {
+          final text = pair.asPascalCase.toString() +
+              (alreadySaved ? " removed from " : " added to ") + "Saved Suggestions";
+          final notifyActionWithPair = SnackBar(content: Text(text),
+            duration: const Duration(seconds: 1));
           if (alreadySaved) {
             _saved.remove(pair);
           } else {
             _saved.add(pair);
           }
+          ScaffoldMessenger.of(context).showSnackBar(notifyActionWithPair);
         });
       },
     );
@@ -81,6 +85,16 @@ class _RandomWordsState extends State<RandomWords> {
                   pair.asPascalCase,
                   style: _biggerFont,
                 ),
+                trailing: const Icon(
+                  Icons.delete,
+                ),
+                onTap: () {
+                  setState(() {
+                    _saved.remove(pair);
+                    Navigator.of(context).pop();
+                    _pushSaved();
+                  });
+                },
               );
             },
           );
